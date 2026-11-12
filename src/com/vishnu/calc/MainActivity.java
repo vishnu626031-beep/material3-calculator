@@ -70,9 +70,19 @@ public class MainActivity extends Activity {
         p = dark ? Palette.dark() : Palette.light();
 
         Window w = getWindow();
-        if (Build.VERSION.SDK_INT >= 21) {
+        // Status bar: light icons only exist from API 23, so use the primary
+        // colour on older releases to keep the icons readable.
+        if (Build.VERSION.SDK_INT >= 23) {
             w.setStatusBarColor(p.surface);
+        } else {
+            w.setStatusBarColor(dark ? p.surface : p.primary);
+        }
+        // Navigation bar tint + matching icon colour (API 27+).
+        if (Build.VERSION.SDK_INT >= 27) {
             w.setNavigationBarColor(p.surface);
+            int flags = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            if (!dark) flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            w.getDecorView().setSystemUiVisibility(flags);
         }
 
         setContentView(buildRoot());
